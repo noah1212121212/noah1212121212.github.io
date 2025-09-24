@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Modern Interactive Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 40px;
+            animation: fadeInDown 1s ease-out;
+        }
+
+        .header h1 {
+            font-size: 3em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+
+        .dashboard {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: all 0.3s ease;
+            animation: fadeInUp 1s ease-out;
+        }
+
+        .card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.2);
+        }
+
+        .card h3 {
+            color: white;
+            margin-bottom: 20px;
+            font-size: 1.5em;
+        }
+
+        .interactive-button {
+            background: linear-gradient(45deg, #ff6b6b, #ee5a24);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 1em;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            margin: 10px 5px;
+        }
+
+        .interactive-button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(255, 107, 107, 0.4);
+        }
+
+        .color-picker {
+            width: 100%;
+            height: 50px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            margin: 10px 0;
+        }
+
+        .slider {
+            width: 100%;
+            margin: 15px 0;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 20px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            overflow: hidden;
+            margin: 15px 0;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #00d4ff, #090979);
+            width: 0%;
+            transition: width 0.3s ease;
+            border-radius: 10px;
+        }
+
+        .animated-box {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(45deg, #feca57, #ff9ff3);
+            border-radius: 15px;
+            margin: 20px auto;
+            animation: spin 3s linear infinite;
+        }
+
+        .text-input {
+            width: 100%;
+            padding: 15px;
+            border: none;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            font-size: 1em;
+            margin: 10px 0;
+        }
+
+        .text-input::placeholder {
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .output-text {
+            color: white;
+            font-size: 1.1em;
+            margin: 15px 0;
+            min-height: 30px;
+        }
+
+        .floating-elements {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        .floating-element {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            animation: float 6s ease-in-out infinite;
+        }
+
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+        }
+
+        .counter {
+            font-size: 2em;
+            color: white;
+            font-weight: bold;
+            text-align: center;
+            margin: 15px 0;
+        }
+
+        .weather-display {
+            text-align: center;
+            color: white;
+        }
+
+        .weather-icon {
+            font-size: 3em;
+            margin: 15px 0;
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2em;
+            }
+            
+            .dashboard {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+            
+            .card {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="floating-elements" id="floatingElements"></div>
+    
+    <div class="container">
+        <div class="header">
+            <h1>✨ Interactive Dashboard</h1>
+            <p>Experience modern web interactions</p>
+        </div>
+
+        <div class="dashboard">
+            <!-- Color & Animation Card -->
+            <div class="card">
+                <h3>🎨 Color & Animation</h3>
+                <input type="color" class="color-picker" id="colorPicker" value="#ff6b6b">
+                <div class="animated-box" id="animatedBox"></div>
+                <button class="interactive-button" onclick="changeAnimation()">Change Animation</button>
+            </div>
+
+            <!-- Counter & Progress Card -->
+            <div class="card">
+                <h3>📊 Counter & Progress</h3>
+                <div class="counter" id="counter">0</div>
+                <button class="interactive-button" onclick="incrementCounter()">+</button>
+                <button class="interactive-button" onclick="decrementCounter()">-</button>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressFill"></div>
+                </div>
+            </div>
+
+            <!-- Text Magic Card -->
+            <div class="card">
+                <h3>✍️ Text Magic</h3>
+                <input type="text" class="text-input" placeholder="Type something amazing..." id="textInput">
+                <button class="interactive-button" onclick="transformText()">Transform</button>
+                <div class="output-text" id="outputText">Your transformed text will appear here</div>
+            </div>
+
+            <!-- Weather Simulator Card -->
+            <div class="card">
+                <h3>🌤️ Weather Simulator</h3>
+                <div class="weather-display">
+                    <div class="weather-icon" id="weatherIcon">☀️</div>
+                    <div id="weatherText">Sunny Day</div>
+                    <div>Temperature: <span id="temperature">72°F</span></div>
+                </div>
+                <button class="interactive-button" onclick="changeWeather()">Change Weather</button>
+            </div>
+
+            <!-- Sound & Vibration Card -->
+            <div class="card">
+                <h3>🔊 Interactive Controls</h3>
+                <input type="range" class="slider" min="1" max="100" value="50" id="volumeSlider">
+                <div class="output-text">Volume: <span id="volumeDisplay">50</span>%</div>
+                <button class="interactive-button" onclick="playSound()">Play Sound</button>
+                <button class="interactive-button" onclick="vibrate()">Vibrate</button>
+            </div>
+
+            <!-- Time & Date Card -->
+            <div class="card">
+                <h3>⏰ Live Time</h3>
+                <div class="counter" id="liveTime"></div>
+                <div class="output-text" id="liveDate"></div>
+                <button class="interactive-button" onclick="showRandomFact()">Random Fact</button>
+                <div class="output-text" id="randomFact"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Global variables
+        let counter = 0;
+        let animationStates = ['spin', 'pulse', 'bounce', 'shake'];
+        let currentAnimation = 0;
+        
+        const weatherStates = [
+            { icon: '☀️', text: 'Sunny Day', temp: '72°F' },
+            { icon: '🌧️', text: 'Rainy Day', temp: '58°F' },
+            { icon: '❄️', text: 'Snowy Day', temp: '32°F' },
+            { icon: '⛅', text: 'Cloudy Day', temp: '65°F' },
+            { icon: '🌩️', text: 'Stormy Day', temp: '60°F' }
+        ];
+        let currentWeather = 0;
+
+        const facts = [
+            "Honey never spoils! Archaeologists have found 3000-year-old honey that's still edible.",
+            "Octopuses have three hearts and blue blood.",
+            "A group of flamingos is called a 'flamboyance'.",
+            "Bananas are berries, but strawberries aren't!",
+            "The longest word in English is 189,819 letters long.",
+            "Dolphins have names for each other.",
+            "A day on Venus is longer than its year.",
+            "Wombat poop is cube-shaped!"
+        ];
+
+        // Initialize floating elements
+        function createFloatingElements() {
+            const container = document.getElementById('floatingElements');
+            for (let i = 0; i < 20; i++) {
+                const element = document.createElement('div');
+                element.className = 'floating-element';
+                element.style.left = Math.random() * 100 + '%';
+                element.style.top = Math.random() * 100 + '%';
+                element.style.animationDelay = Math.random() * 6 + 's';
+                container.appendChild(element);
+            }
+        }
+
+        // Color picker functionality
+        document.getElementById('colorPicker').addEventListener('change', function(e) {
+            const color = e.target.value;
+            document.getElementById('animatedBox').style.background = 
+                `linear-gradient(45deg, ${color}, ${color}88)`;
+        });
+
+        // Counter functions
+        function incrementCounter() {
+            counter++;
+            updateCounter();
+        }
+
+        function decrementCounter() {
+            counter--;
+            updateCounter();
+        }
+
+        function updateCounter() {
+            document.getElementById('counter').textContent = counter;
+            const progress = Math.max(0, Math.min(100, counter * 10));
+            document.getElementById('progressFill').style.width = progress + '%';
+        }
+
+        // Animation changer
+        function changeAnimation() {
+            const box = document.getElementById('animatedBox');
+            currentAnimation = (currentAnimation + 1) % animationStates.length;
+            
+            // Remove all animation classes
+            box.style.animation = 'none';
+            box.offsetHeight; // Trigger reflow
+            
+            // Add new animation
+            switch(animationStates[currentAnimation]) {
+                case 'pulse':
+                    box.style.animation = 'pulse 1s ease-in-out infinite alternate';
+                    break;
+                case 'bounce':
+                    box.style.animation = 'bounce 1s ease infinite';
+                    break;
+                case 'shake':
+                    box.style.animation = 'shake 0.5s ease-in-out infinite';
+                    break;
+                default:
+                    box.style.animation = 'spin 3s linear infinite';
+            }
+        }
+
+        // Text transformation
+        function transformText() {
+            const input = document.getElementById('textInput').value;
+            if (!input) return;
+            
+            const transformations = [
+                text => text.toUpperCase(),
+                text => text.toLowerCase(),
+                text => text.split('').reverse().join(''),
+                text => text.replace(/[aeiou]/gi, '✨'),
+                text => text.split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' '),
+                text => text.split('').join(' '),
+                text => `🌟 ${text} 🌟`,
+                text => text.replace(/./g, (char, index) => index % 2 === 0 ? char.toUpperCase() : char.toLowerCase())
+            ];
+            
+            const randomTransform = transformations[Math.floor(Math.random() * transformations.length)];
+            document.getElementById('outputText').textContent = randomTransform(input);
+        }
+
+        // Weather changer
+        function changeWeather() {
+            currentWeather = (currentWeather + 1) % weatherStates.length;
+            const weather = weatherStates[currentWeather];
+            
+            document.getElementById('weatherIcon').textContent = weather.icon;
+            document.getElementById('weatherText').textContent = weather.text;
+            document.getElementById('temperature').textContent = weather.temp;
+        }
+
+        // Volume slider
+        document.getElementById('volumeSlider').addEventListener('input', function(e) {
+            document.getElementById('volumeDisplay').textContent = e.target.value;
+        });
+
+        // Sound player (uses Web Audio API if available)
+        function playSound() {
+            try {
+                const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                const oscillator = audioContext.createOscillator();
+                const gainNode = audioContext.createGain();
+                
+                oscillator.connect(gainNode);
+                gainNode.connect(audioContext.destination);
+                
+                oscillator.frequency.value = 440;
+                oscillator.type = 'sine';
+                
+                gainNode.gain.setValueAtTime(0, audioContext.currentTime);
+                gainNode.gain.linearRampToValueAtTime(0.1, audioContext.currentTime + 0.1);
+                gainNode.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + 0.5);
+                
+                oscillator.start(audioContext.currentTime);
+                oscillator.stop(audioContext.currentTime + 0.5);
+            } catch (e) {
+                console.log('Audio not supported');
+            }
+        }
+
+        // Vibration (if supported)
+        function vibrate() {
+            if ('vibrate' in navigator) {
+                navigator.vibrate([100, 50, 100]);
+            } else {
+                console.log('Vibration not supported');
+            }
+        }
+
+        // Live time update
+        function updateTime() {
+            const now = new Date();
+            document.getElementById('liveTime').textContent = now.toLocaleTimeString();
+            document.getElementById('liveDate').textContent = now.toLocaleDateString('en-US', {
+                weekday: 'long',
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            });
+        }
+
+        // Random fact generator
+        function showRandomFact() {
+            const randomFact = facts[Math.floor(Math.random() * facts.length)];
+            document.getElementById('randomFact').textContent = randomFact;
+        }
+
+        // Additional CSS animations
+        const additionalStyles = `
+            @keyframes pulse {
+                from { transform: scale(1); }
+                to { transform: scale(1.1); }
+            }
+            
+            @keyframes bounce {
+                0%, 20%, 53%, 80%, 100% { transform: translateY(0); }
+                40%, 43% { transform: translateY(-15px); }
+                70% { transform: translateY(-7px); }
+                90% { transform: translateY(-3px); }
+            }
+            
+            @keyframes shake {
+                0%, 100% { transform: translateX(0); }
+                25% { transform: translateX(-5px); }
+                75% { transform: translateX(5px); }
+            }
+        `;
+
+        // Add additional styles
+        const styleSheet = document.createElement('style');
+        styleSheet.textContent = additionalStyles;
+        document.head.appendChild(styleSheet);
+
+        // Initialize everything when page loads
+        window.addEventListener('load', function() {
+            createFloatingElements();
+            updateTime();
+            setInterval(updateTime, 1000);
+            
+            // Add some initial interactivity
+            setTimeout(() => {
+                document.getElementById('randomFact').textContent = "Welcome! Click 'Random Fact' for interesting trivia!";
+            }, 1000);
+        });
+
+        // Add keyboard shortcuts
+        document.addEventListener('keydown', function(e) {
+            if (e.key === ' ') {
+                e.preventDefault();
+                changeAnimation();
+            } else if (e.key === 'Enter' && document.activeElement.id === 'textInput') {
+                transformText();
+            }
+        });
+
+        // Add touch/mouse effects
+        document.addEventListener('mousemove', function(e) {
+            const cards = document.querySelectorAll('.card');
+            cards.forEach(card => {
+                const rect = card.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                
+                if (x >= 0 && x <= rect.width && y >= 0 && y <= rect.height) {
+                    const centerX = rect.width / 2;
+                    const centerY = rect.height / 2;
+                    const rotateX = (y - centerY) / 10;
+                    const rotateY = (centerX - x) / 10;
+                    
+                    card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) translateY(-10px)`;
+                } else {
+                    card.style.transform = '';
+                }
+            });
+        });
+    </script>
+</body>
+</html>
