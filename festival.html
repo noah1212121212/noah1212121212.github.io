@@ -1,0 +1,731 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Festival 360° Tour</title>
+  <style>
+    body { 
+      margin: 0; 
+      overflow: hidden; 
+      font-family: Arial, sans-serif;
+    }
+    canvas { 
+      display: block; 
+    }
+    #info {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      color: white;
+      background: rgba(0,0,0,0.8);
+      padding: 15px;
+      border-radius: 8px;
+      z-index: 1000;
+      max-width: 300px;
+    }
+    #info h3 { 
+      margin: 0 0 10px 0; 
+      font-size: 18px; 
+    }
+    #info p { 
+      margin: 5px 0; 
+      font-size: 14px; 
+    }
+    .audio-note {
+      color: #ffff00;
+      font-weight: bold;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+  <div id="info">
+    <h3>🎪 Festival Experience</h3>
+    <p><strong>Controls:</strong></p>
+    <p>• Drag to look around</p>
+    <p>• Arrow keys or WASD to move</p>
+    <p>• Explore the tents and crowd!</p>
+    <p class="audio-note">⚠️ Click anywhere to enable audio</p>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script>
+    let scene, camera, renderer;
+    let moveForward = false, moveBackward = false, moveLeft = false, moveRight = false;
+    let velocity = new THREE.Vector3();
+    let direction = new THREE.Vector3();
+    const clock = new THREE.Clock();
+
+    // Mouse controls
+    let isMouseDown = false;
+    let mouseX = 0, mouseY = 0;
+    let lon = 0, lat = 0;
+    let phi = 0, theta = 0;
+
+    // Audio setup
+    let audioContext, backgroundMusic, crowdNoise;
+    let audioInitialized = false;
+
+    // Speech bubbles
+    let speechBubbles = [];
+
+    init();
+    animate();
+
+    function initAudio() {
+      if (audioInitialized) return;
+      audioInitialized = true;
+
+      audioContext = new (window.AudioContext || window.webkitAudioContext)();
+
+      // Create ambient crowd noise (using oscillators)
+      createCrowdNoise();
+      
+      // Create background music atmosphere
+      createBackgroundMusic();
+    }
+
+    function createCrowdNoise() {
+      // White noise for crowd ambience
+      const bufferSize = 2 * audioContext.sampleRate;
+      const noiseBuffer = audioContext.createBuffer(1, bufferSize, audioContext.sampleRate);
+      const output = noiseBuffer.getChannelData(0);
+      for (let i = 0; i < bufferSize; i++) {
+        output[i] = Math.random() * 2 - 1;
+      }
+
+      crowdNoise = audioContext.createBufferSource();
+      crowdNoise.buffer = noiseBuffer;
+      crowdNoise.loop = true;
+
+      const crowdFilter = audioContext.createBiquadFilter();
+      crowdFilter.type = 'bandpass';
+      crowdFilter.frequency.value = 800;
+      
+      const crowdGain = audioContext.createGain();
+      crowdGain.gain.value = 0.05;
+
+      crowdNoise.connect(crowdFilter);
+      crowdFilter.connect(crowdGain);
+      crowdGain.connect(audioContext.destination);
+
+      crowdNoise.start(0);
+    }
+
+    function createBackgroundMusic() {
+      // Create a simple ambient music loop using oscillators
+      const osc1 = audioContext.createOscillator();
+      const osc2 = audioContext.createOscillator();
+      const osc3 = audioContext.createOscillator();
+
+      osc1.type = 'sine';
+      osc2.type = 'sine';
+      osc3.type = 'triangle';
+
+      osc1.frequency.value = 220; // A3
+      osc2.frequency.value = 330; // E4
+      osc3.frequency.value = 440; // A4
+
+      const musicGain = audioContext.createGain();
+      musicGain.gain.value = 0.03;
+
+      osc1.connect(musicGain);
+      osc2.connect(musicGain);
+      osc3.connect(musicGain);
+      musicGain.connect(audioContext.destination);
+
+      osc1.start(0);
+      osc2.start(0);
+      osc3.start(0);
+
+      // Fade in and out for ambient effect
+      const now = audioContext.currentTime;
+      musicGain.gain.setValueAtTime(0, now);
+      musicGain.gain.linearRampToValueAtTime(0.03, now + 2);
+    }
+
+    function init() {
+      // Scene
+      scene = new THREE.Scene();
+      scene.background = new THREE.Color(0x87CEEB); // Sky blue
+      scene.fog = new THREE.Fog(0x87CEEB, 50, 150);
+
+      // Camera
+      camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+      camera.position.set(0, 1.6, 5);
+
+      // Renderer
+      renderer = new THREE.WebGLRenderer({ antialias: true });
+      renderer.setSize(window.innerWidth, window.innerHeight);
+      renderer.shadowMap.enabled = true;
+      document.body.appendChild(renderer.domElement);
+
+      // Lighting
+      const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
+      scene.add(ambientLight);
+
+      const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
+      directionalLight.position.set(20, 40, 10);
+      directionalLight.castShadow = true;
+      scene.add(directionalLight);
+
+      // Ground
+      const groundGeometry = new THREE.PlaneGeometry(200, 200);
+      const groundMaterial = new THREE.MeshStandardMaterial({ 
+        color: 0x5d8a3a, 
+        roughness: 0.9 
+      });
+      const ground = new THREE.Mesh(groundGeometry, groundMaterial);
+      ground.rotation.x = -Math.PI / 2;
+      ground.receiveShadow = true;
+      scene.add(ground);
+
+      // Add festival elements
+      createMainStage();
+      createTents();
+      createFoodStalls();
+      createCrowd();
+      createDecorations();
+      createTrees();
+      createSpeechBubbles();
+
+      // Event listeners
+      document.addEventListener('keydown', onKeyDown);
+      document.addEventListener('keyup', onKeyUp);
+      document.addEventListener('mousedown', onMouseDown);
+      document.addEventListener('mousemove', onMouseMove);
+      document.addEventListener('mouseup', onMouseUp);
+      document.addEventListener('click', initAudio, { once: true });
+      window.addEventListener('resize', onWindowResize);
+    }
+
+    function createMainStage() {
+      const stageGroup = new THREE.Group();
+      
+      // Stage platform
+      const platformGeometry = new THREE.BoxGeometry(15, 1, 10);
+      const platformMaterial = new THREE.MeshStandardMaterial({ color: 0x2c2c2c });
+      const platform = new THREE.Mesh(platformGeometry, platformMaterial);
+      platform.position.set(0, 0.5, -30);
+      platform.castShadow = true;
+      stageGroup.add(platform);
+
+      // Backdrop
+      const backdropGeometry = new THREE.BoxGeometry(15, 8, 0.5);
+      const backdropMaterial = new THREE.MeshStandardMaterial({ color: 0x8b00ff });
+      const backdrop = new THREE.Mesh(backdropGeometry, backdropMaterial);
+      backdrop.position.set(0, 4.5, -34.5);
+      stageGroup.add(backdrop);
+
+      // Stage lights (decorative)
+      for (let i = -6; i <= 6; i += 3) {
+        const lightGeometry = new THREE.CylinderGeometry(0.2, 0.2, 0.5);
+        const lightMaterial = new THREE.MeshStandardMaterial({ 
+          color: 0xffff00, 
+          emissive: 0xffff00,
+          emissiveIntensity: 0.5
+        });
+        const light = new THREE.Mesh(lightGeometry, lightMaterial);
+        light.position.set(i, 9, -33);
+        light.rotation.x = Math.PI / 4;
+        stageGroup.add(light);
+      }
+
+      // Support beams
+      for (let i = -6; i <= 6; i += 12) {
+        const beamGeometry = new THREE.BoxGeometry(0.3, 10, 0.3);
+        const beamMaterial = new THREE.MeshStandardMaterial({ color: 0x444444 });
+        const beam = new THREE.Mesh(beamGeometry, beamMaterial);
+        beam.position.set(i, 5, -34);
+        stageGroup.add(beam);
+      }
+
+      scene.add(stageGroup);
+    }
+
+    function createTents() {
+      const tentPositions = [
+        { x: -15, z: -10 }, { x: 15, z: -10 },
+        { x: -20, z: 5 }, { x: 20, z: 5 },
+        { x: -15, z: 15 }, { x: 15, z: 15 },
+        { x: -25, z: -20 }, { x: 25, z: -20 }
+      ];
+
+      const tentColors = [
+        0xff4444, 0x4444ff, 0x44ff44, 0xffff44,
+        0xff44ff, 0x44ffff, 0xff8844, 0x8844ff
+      ];
+
+      tentPositions.forEach((pos, index) => {
+        createTent(pos.x, pos.z, tentColors[index]);
+      });
+    }
+
+    function createTent(x, z, color) {
+      const tentGroup = new THREE.Group();
+
+      // Tent roof (pyramid)
+      const roofGeometry = new THREE.ConeGeometry(3, 4, 4);
+      const roofMaterial = new THREE.MeshStandardMaterial({ 
+        color: color,
+        roughness: 0.8
+      });
+      const roof = new THREE.Mesh(roofGeometry, roofMaterial);
+      roof.position.y = 3;
+      roof.rotation.y = Math.PI / 4;
+      roof.castShadow = true;
+      tentGroup.add(roof);
+
+      // Tent pole
+      const poleGeometry = new THREE.CylinderGeometry(0.1, 0.1, 5);
+      const poleMaterial = new THREE.MeshStandardMaterial({ color: 0x8b4513 });
+      const pole = new THREE.Mesh(poleGeometry, poleMaterial);
+      pole.position.y = 2.5;
+      tentGroup.add(pole);
+
+      // Tent base/walls
+      const baseGeometry = new THREE.CylinderGeometry(2.8, 2.8, 0.5, 4);
+      const baseMaterial = new THREE.MeshStandardMaterial({ 
+        color: color,
+        roughness: 0.9
+      });
+      const base = new THREE.Mesh(baseGeometry, baseMaterial);
+      base.position.y = 0.25;
+      base.rotation.y = Math.PI / 4;
+      tentGroup.add(base);
+
+      tentGroup.position.set(x, 0, z);
+      scene.add(tentGroup);
+    }
+
+    function createFoodStalls() {
+      const stallPositions = [
+        { x: -8, z: 8 }, { x: 0, z: 10 }, { x: 8, z: 8 }
+      ];
+
+      stallPositions.forEach((pos, index) => {
+        createFoodStall(pos.x, pos.z, index);
+      });
+    }
+
+    function createFoodStall(x, z, type) {
+      const stallGroup = new THREE.Group();
+
+      // Counter
+      const counterGeometry = new THREE.BoxGeometry(4, 1, 2);
+      const counterMaterial = new THREE.MeshStandardMaterial({ color: 0x8b4513 });
+      const counter = new THREE.Mesh(counterGeometry, counterMaterial);
+      counter.position.y = 1;
+      counter.castShadow = true;
+      stallGroup.add(counter);
+
+      // Roof
+      const roofGeometry = new THREE.BoxGeometry(5, 0.2, 3);
+      const roofMaterial = new THREE.MeshStandardMaterial({ 
+        color: type === 0 ? 0xff6347 : type === 1 ? 0xffd700 : 0x4169e1 
+      });
+      const roof = new THREE.Mesh(roofGeometry, roofMaterial);
+      roof.position.y = 2.5;
+      stallGroup.add(roof);
+
+      // Support poles
+      for (let i = -1.8; i <= 1.8; i += 3.6) {
+        for (let j = -0.8; j <= 0.8; j += 1.6) {
+          const poleGeometry = new THREE.CylinderGeometry(0.08, 0.08, 1.5);
+          const poleMaterial = new THREE.MeshStandardMaterial({ color: 0x654321 });
+          const pole = new THREE.Mesh(poleGeometry, poleMaterial);
+          pole.position.set(i, 1.75, j);
+          stallGroup.add(pole);
+        }
+      }
+
+      stallGroup.position.set(x, 0, z);
+      scene.add(stallGroup);
+    }
+
+    function createCrowd() {
+      // Crowd in front of stage
+      for (let i = 0; i < 150; i++) {
+        const x = (Math.random() - 0.5) * 30;
+        const z = -25 + Math.random() * 15;
+        createPerson(x, z);
+      }
+
+      // Scattered crowd around festival
+      for (let i = 0; i < 100; i++) {
+        const x = (Math.random() - 0.5) * 50;
+        const z = Math.random() * 30;
+        createPerson(x, z);
+      }
+    }
+
+    function createPerson(x, z) {
+      const personGroup = new THREE.Group();
+
+      // Body
+      const bodyGeometry = new THREE.CylinderGeometry(0.2, 0.15, 0.8);
+      const shirtColors = [
+        0xff0000, 0x00ff00, 0x0000ff, 0xffff00, 
+        0xff00ff, 0x00ffff, 0xffffff, 0x000000,
+        0xff8800, 0x88ff00, 0x8800ff
+      ];
+      const bodyMaterial = new THREE.MeshStandardMaterial({ 
+        color: shirtColors[Math.floor(Math.random() * shirtColors.length)] 
+      });
+      const body = new THREE.Mesh(bodyGeometry, bodyMaterial);
+      body.position.y = 0.8;
+      body.castShadow = true;
+      personGroup.add(body);
+
+      // Head
+      const headGeometry = new THREE.SphereGeometry(0.15, 8, 8);
+      const skinTones = [0xFFDBAC, 0xF1C27D, 0xE0AC69, 0xC68642, 0x8D5524, 0x6B3410];
+      const headMaterial = new THREE.MeshStandardMaterial({ 
+        color: skinTones[Math.floor(Math.random() * skinTones.length)] 
+      });
+      const head = new THREE.Mesh(headGeometry, headMaterial);
+      head.position.y = 1.4;
+      personGroup.add(head);
+
+      // Random pose
+      personGroup.rotation.y = Math.random() * Math.PI * 2;
+      personGroup.position.set(x, 0, z);
+      
+      scene.add(personGroup);
+    }
+
+    function createDecorations() {
+      // Colorful flags/banners
+      for (let i = -40; i <= 40; i += 10) {
+        createFlag(i, 0, -35);
+        createFlag(i, 0, 25);
+      }
+
+      // Balloons
+      for (let i = 0; i < 20; i++) {
+        const x = (Math.random() - 0.5) * 60;
+        const y = 3 + Math.random() * 4;
+        const z = (Math.random() - 0.5) * 60;
+        createBalloon(x, y, z);
+      }
+    }
+
+    function createFlag(x, y, z) {
+      const flagGroup = new THREE.Group();
+
+      // Pole
+      const poleGeometry = new THREE.CylinderGeometry(0.05, 0.05, 4);
+      const poleMaterial = new THREE.MeshStandardMaterial({ color: 0xcccccc });
+      const pole = new THREE.Mesh(poleGeometry, poleMaterial);
+      pole.position.y = 2;
+      flagGroup.add(pole);
+
+      // Flag
+      const flagGeometry = new THREE.PlaneGeometry(1, 0.6);
+      const flagColors = [0xff0000, 0x00ff00, 0x0000ff, 0xffff00, 0xff00ff];
+      const flagMaterial = new THREE.MeshStandardMaterial({ 
+        color: flagColors[Math.floor(Math.random() * flagColors.length)],
+        side: THREE.DoubleSide
+      });
+      const flag = new THREE.Mesh(flagGeometry, flagMaterial);
+      flag.position.set(0.5, 3.7, 0);
+      flagGroup.add(flag);
+
+      flagGroup.position.set(x, y, z);
+      scene.add(flagGroup);
+    }
+
+    function createBalloon(x, y, z) {
+      const balloonGeometry = new THREE.SphereGeometry(0.3, 8, 8);
+      const balloonColors = [0xff0000, 0x00ff00, 0x0000ff, 0xffff00, 0xff00ff];
+      const balloonMaterial = new THREE.MeshStandardMaterial({ 
+        color: balloonColors[Math.floor(Math.random() * balloonColors.length)],
+        roughness: 0.3
+      });
+      const balloon = new THREE.Mesh(balloonGeometry, balloonMaterial);
+      balloon.position.set(x, y, z);
+      scene.add(balloon);
+
+      // String
+      const stringGeometry = new THREE.CylinderGeometry(0.01, 0.01, y - 0.3);
+      const stringMaterial = new THREE.MeshStandardMaterial({ color: 0x333333 });
+      const string = new THREE.Mesh(stringGeometry, stringMaterial);
+      string.position.set(x, y / 2, z);
+      scene.add(string);
+    }
+
+    function createTrees() {
+      const treePositions = [
+        { x: -35, z: -5 }, { x: -35, z: 10 }, { x: -35, z: 25 },
+        { x: 35, z: -5 }, { x: 35, z: 10 }, { x: 35, z: 25 },
+        { x: -30, z: -35 }, { x: 30, z: -35 }
+      ];
+
+      treePositions.forEach(pos => {
+        createTree(pos.x, pos.z);
+      });
+    }
+
+    function createTree(x, z) {
+      const treeGroup = new THREE.Group();
+
+      // Trunk
+      const trunkGeometry = new THREE.CylinderGeometry(0.4, 0.5, 4);
+      const trunkMaterial = new THREE.MeshStandardMaterial({ color: 0x8b4513 });
+      const trunk = new THREE.Mesh(trunkGeometry, trunkMaterial);
+      trunk.position.y = 2;
+      trunk.castShadow = true;
+      treeGroup.add(trunk);
+
+      // Foliage (3 levels)
+      for (let i = 0; i < 3; i++) {
+        const foliageGeometry = new THREE.ConeGeometry(2 - i * 0.4, 2, 8);
+        const foliageMaterial = new THREE.MeshStandardMaterial({ color: 0x228b22 });
+        const foliage = new THREE.Mesh(foliageGeometry, foliageMaterial);
+        foliage.position.y = 4 + i * 1.3;
+        foliage.castShadow = true;
+        treeGroup.add(foliage);
+      }
+
+      treeGroup.position.set(x, 0, z);
+      scene.add(treeGroup);
+    }
+
+    function createSpeechBubbles() {
+      const funFacts = [
+        "This festival has\n5000+ attendees!",
+        "Try the tacos at\nthe food stalls!",
+        "Main act starts\nat 8 PM!",
+        "Welcome to\nSummer Fest 2025!",
+        "Don't forget to\nvisit all tents!",
+        "Music all day\nand night!",
+        "Best festival\nof the year!",
+        "Craft beer tent\nto your left!",
+        "Photo booth\nat the blue tent!",
+        "Fireworks show\nat midnight!"
+      ];
+
+      const bubblePositions = [
+        { x: 0, y: 10, z: -30, text: funFacts[0] },
+        { x: -15, y: 6, z: -10, text: funFacts[1] },
+        { x: 15, y: 6, z: -10, text: funFacts[2] },
+        { x: -8, y: 4, z: 8, text: funFacts[3] },
+        { x: 8, y: 4, z: 8, text: funFacts[4] },
+        { x: -20, y: 6, z: 5, text: funFacts[5] },
+        { x: 20, y: 6, z: 5, text: funFacts[6] },
+        { x: -15, y: 6, z: 15, text: funFacts[7] },
+        { x: 15, y: 6, z: 15, text: funFacts[8] },
+        { x: 0, y: 5, z: 10, text: funFacts[9] }
+      ];
+
+      bubblePositions.forEach(pos => {
+        createSpeechBubble(pos.x, pos.y, pos.z, pos.text);
+      });
+    }
+
+    function createSpeechBubble(x, y, z, text) {
+      const bubbleGroup = new THREE.Group();
+
+      // Bubble background
+      const bubbleGeometry = new THREE.PlaneGeometry(2.5, 1.2);
+      const bubbleMaterial = new THREE.MeshBasicMaterial({ 
+        color: 0xffffff,
+        side: THREE.DoubleSide,
+        transparent: true,
+        opacity: 0.9
+      });
+      const bubble = new THREE.Mesh(bubbleGeometry, bubbleMaterial);
+      bubbleGroup.add(bubble);
+
+      // Border
+      const borderGeometry = new THREE.PlaneGeometry(2.6, 1.3);
+      const borderMaterial = new THREE.MeshBasicMaterial({ 
+        color: 0x000000,
+        side: THREE.DoubleSide
+      });
+      const border = new THREE.Mesh(borderGeometry, borderMaterial);
+      border.position.z = -0.01;
+      bubbleGroup.add(border);
+
+      // Speech bubble tail (small triangle)
+      const tailGeometry = new THREE.ConeGeometry(0.2, 0.4, 3);
+      const tailMaterial = new THREE.MeshBasicMaterial({ color: 0xffffff });
+      const tail = new THREE.Mesh(tailGeometry, tailMaterial);
+      tail.position.set(0, -0.8, 0);
+      tail.rotation.z = Math.PI;
+      bubbleGroup.add(tail);
+
+      // Create text using canvas
+      const canvas = document.createElement('canvas');
+      const context = canvas.getContext('2d');
+      canvas.width = 512;
+      canvas.height = 256;
+
+      context.fillStyle = 'rgba(255, 255, 255, 0)';
+      context.fillRect(0, 0, canvas.width, canvas.height);
+
+      context.font = 'bold 40px Arial';
+      context.fillStyle = 'black';
+      context.textAlign = 'center';
+      context.textBaseline = 'middle';
+
+      const lines = text.split('\n');
+      const lineHeight = 50;
+      const startY = (canvas.height - (lines.length - 1) * lineHeight) / 2;
+
+      lines.forEach((line, index) => {
+        context.fillText(line, canvas.width / 2, startY + index * lineHeight);
+      });
+
+      const textTexture = new THREE.CanvasTexture(canvas);
+      const textMaterial = new THREE.MeshBasicMaterial({ 
+        map: textTexture,
+        transparent: true,
+        side: THREE.DoubleSide
+      });
+      const textMesh = new THREE.Mesh(
+        new THREE.PlaneGeometry(2.4, 1.15),
+        textMaterial
+      );
+      textMesh.position.z = 0.01;
+      bubbleGroup.add(textMesh);
+
+      bubbleGroup.position.set(x, y, z);
+      scene.add(bubbleGroup);
+      speechBubbles.push(bubbleGroup);
+    }
+
+    function onKeyDown(event) {
+      switch (event.code) {
+        case 'ArrowUp':
+        case 'KeyW':
+          moveForward = true;
+          break;
+        case 'ArrowDown':
+        case 'KeyS':
+          moveBackward = true;
+          break;
+        case 'ArrowLeft':
+        case 'KeyA':
+          moveLeft = true;
+          break;
+        case 'ArrowRight':
+        case 'KeyD':
+          moveRight = true;
+          break;
+      }
+    }
+
+    function onKeyUp(event) {
+      switch (event.code) {
+        case 'ArrowUp':
+        case 'KeyW':
+          moveForward = false;
+          break;
+        case 'ArrowDown':
+        case 'KeyS':
+          moveBackward = false;
+          break;
+        case 'ArrowLeft':
+        case 'KeyA':
+          moveLeft = false;
+          break;
+        case 'ArrowRight':
+        case 'KeyD':
+          moveRight = false;
+          break;
+      }
+    }
+
+    function onMouseDown(event) {
+      isMouseDown = true;
+      mouseX = event.clientX;
+      mouseY = event.clientY;
+    }
+
+    function onMouseMove(event) {
+      if (isMouseDown) {
+        const deltaX = event.clientX - mouseX;
+        const deltaY = event.clientY - mouseY;
+        
+        lon -= deltaX * 0.1;
+        lat += deltaY * 0.1;
+        
+        lat = Math.max(-85, Math.min(85, lat));
+        
+        mouseX = event.clientX;
+        mouseY = event.clientY;
+      }
+    }
+
+    function onMouseUp() {
+      isMouseDown = false;
+    }
+
+    function onWindowResize() {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+    }
+
+    function animate() {
+      requestAnimationFrame(animate);
+
+      const delta = clock.getDelta();
+      const time = clock.getElapsedTime();
+
+      // Animate speech bubbles (floating effect)
+      speechBubbles.forEach((bubble, index) => {
+        bubble.rotation.y = Math.sin(time + index) * 0.1;
+        bubble.position.y += Math.sin(time * 2 + index) * 0.001;
+        
+        // Make bubbles face camera
+        bubble.lookAt(camera.position);
+      });
+
+      // Movement
+      velocity.x -= velocity.x * 10.0 * delta;
+      velocity.z -= velocity.z * 10.0 * delta;
+
+      direction.z = Number(moveForward) - Number(moveBackward);
+      direction.x = Number(moveRight) - Number(moveLeft);
+      direction.normalize();
+
+      if (moveForward || moveBackward) velocity.z -= direction.z * 20.0 * delta;
+      if (moveLeft || moveRight) velocity.x -= direction.x * 20.0 * delta;
+
+      // Camera rotation
+      phi = THREE.MathUtils.degToRad(90 - lat);
+      theta = THREE.MathUtils.degToRad(lon);
+
+      camera.target = new THREE.Vector3(
+        Math.sin(phi) * Math.cos(theta),
+        Math.cos(phi),
+        Math.sin(phi) * Math.sin(theta)
+      );
+
+      camera.lookAt(camera.position.clone().add(camera.target));
+
+      // Apply movement
+      const forward = new THREE.Vector3(0, 0, -1);
+      forward.applyQuaternion(camera.quaternion);
+      forward.y = 0;
+      forward.normalize();
+
+      const right = new THREE.Vector3(1, 0, 0);
+      right.applyQuaternion(camera.quaternion);
+      right.y = 0;
+      right.normalize();
+
+      camera.position.add(forward.multiplyScalar(velocity.z * delta));
+      camera.position.add(right.multiplyScalar(velocity.x * delta));
+
+      // Keep camera above ground
+      camera.position.y = Math.max(camera.position.y, 1.6);
+
+      renderer.render(scene, camera);
+    }
+  </script>
+</body>
+</html>
