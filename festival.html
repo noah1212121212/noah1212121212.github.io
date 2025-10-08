@@ -189,6 +189,8 @@
       createDecorations();
       createTrees();
       createSpeechBubbles();
+      createRollerCoasters();
+      createCarnivalGames();
 
       // Event listeners
       document.addEventListener('keydown', onKeyDown);
@@ -493,30 +495,40 @@
     }
 
     function createSpeechBubbles() {
-      const funFacts = [
-        "This festival has\n5000+ attendees!",
-        "Try the tacos at\nthe food stalls!",
-        "Main act starts\nat 8 PM!",
-        "Welcome to\nSummer Fest 2025!",
-        "Don't forget to\nvisit all tents!",
-        "Music all day\nand night!",
-        "Best festival\nof the year!",
-        "Craft beer tent\nto your left!",
-        "Photo booth\nat the blue tent!",
-        "Fireworks show\nat midnight!"
+      const jokes = [
+        "Why don't eggs\ntell jokes?\nThey'd crack up!",
+        "What do you call\na fake noodle?\nAn impasta!",
+        "Why did the\nscarecrow win?\nHe was outstanding!",
+        "What's orange and\nsounds like parrot?\nA carrot!",
+        "Why don't scientists\ntrust atoms?\nThey make up\neverything!",
+        "What did the ocean\nsay to beach?\nNothing, just waved!",
+        "Why did cookie go\nto the doctor?\nIt felt crumbly!",
+        "What do you call\na bear with no teeth?\nA gummy bear!",
+        "Why can't bicycle\nstand alone?\nIt's two tired!",
+        "What's a pirate's\nfavorite letter?\nYou'd think R,\nbut it's the C!",
+        "Win a prize at\nthe ring toss!",
+        "Try the\nroller coaster!",
+        "Carnival games\nahead!",
+        "Best funnel cakes\nin town!",
+        "Photo booth\nthis way!"
       ];
 
       const bubblePositions = [
-        { x: 0, y: 10, z: -30, text: funFacts[0] },
-        { x: -15, y: 6, z: -10, text: funFacts[1] },
-        { x: 15, y: 6, z: -10, text: funFacts[2] },
-        { x: -8, y: 4, z: 8, text: funFacts[3] },
-        { x: 8, y: 4, z: 8, text: funFacts[4] },
-        { x: -20, y: 6, z: 5, text: funFacts[5] },
-        { x: 20, y: 6, z: 5, text: funFacts[6] },
-        { x: -15, y: 6, z: 15, text: funFacts[7] },
-        { x: 15, y: 6, z: 15, text: funFacts[8] },
-        { x: 0, y: 5, z: 10, text: funFacts[9] }
+        { x: 0, y: 10, z: -30, text: jokes[0] },
+        { x: -15, y: 6, z: -10, text: jokes[1] },
+        { x: 15, y: 6, z: -10, text: jokes[2] },
+        { x: -8, y: 4, z: 8, text: jokes[3] },
+        { x: 8, y: 4, z: 8, text: jokes[4] },
+        { x: -20, y: 6, z: 5, text: jokes[5] },
+        { x: 20, y: 6, z: 5, text: jokes[6] },
+        { x: -15, y: 6, z: 15, text: jokes[7] },
+        { x: 15, y: 6, z: 15, text: jokes[8] },
+        { x: 0, y: 5, z: 10, text: jokes[9] },
+        { x: -30, y: 5, z: -25, text: jokes[10] },
+        { x: 30, y: 5, z: -25, text: jokes[11] },
+        { x: -25, y: 5, z: 20, text: jokes[12] },
+        { x: 25, y: 5, z: 20, text: jokes[13] },
+        { x: 0, y: 5, z: 25, text: jokes[14] }
       ];
 
       bubblePositions.forEach(pos => {
@@ -528,7 +540,7 @@
       const bubbleGroup = new THREE.Group();
 
       // Bubble background
-      const bubbleGeometry = new THREE.PlaneGeometry(2.5, 1.2);
+      const bubbleGeometry = new THREE.PlaneGeometry(2.5, 1.8);
       const bubbleMaterial = new THREE.MeshBasicMaterial({ 
         color: 0xffffff,
         side: THREE.DoubleSide,
@@ -539,7 +551,7 @@
       bubbleGroup.add(bubble);
 
       // Border
-      const borderGeometry = new THREE.PlaneGeometry(2.6, 1.3);
+      const borderGeometry = new THREE.PlaneGeometry(2.6, 1.9);
       const borderMaterial = new THREE.MeshBasicMaterial({ 
         color: 0x000000,
         side: THREE.DoubleSide
@@ -552,7 +564,7 @@
       const tailGeometry = new THREE.ConeGeometry(0.2, 0.4, 3);
       const tailMaterial = new THREE.MeshBasicMaterial({ color: 0xffffff });
       const tail = new THREE.Mesh(tailGeometry, tailMaterial);
-      tail.position.set(0, -0.8, 0);
+      tail.position.set(0, -1.1, 0);
       tail.rotation.z = Math.PI;
       bubbleGroup.add(tail);
 
@@ -560,18 +572,18 @@
       const canvas = document.createElement('canvas');
       const context = canvas.getContext('2d');
       canvas.width = 512;
-      canvas.height = 256;
+      canvas.height = 384;
 
       context.fillStyle = 'rgba(255, 255, 255, 0)';
       context.fillRect(0, 0, canvas.width, canvas.height);
 
-      context.font = 'bold 40px Arial';
+      context.font = 'bold 32px Arial';
       context.fillStyle = 'black';
       context.textAlign = 'center';
       context.textBaseline = 'middle';
 
       const lines = text.split('\n');
-      const lineHeight = 50;
+      const lineHeight = 42;
       const startY = (canvas.height - (lines.length - 1) * lineHeight) / 2;
 
       lines.forEach((line, index) => {
@@ -585,7 +597,7 @@
         side: THREE.DoubleSide
       });
       const textMesh = new THREE.Mesh(
-        new THREE.PlaneGeometry(2.4, 1.15),
+        new THREE.PlaneGeometry(2.4, 1.75),
         textMaterial
       );
       textMesh.position.z = 0.01;
@@ -594,6 +606,223 @@
       bubbleGroup.position.set(x, y, z);
       scene.add(bubbleGroup);
       speechBubbles.push(bubbleGroup);
+    }
+
+    function createRollerCoasters() {
+      // Left roller coaster
+      createRollerCoaster(-40, 0, -10, 0xff0000);
+      
+      // Right roller coaster
+      createRollerCoaster(40, 0, -10, 0x0000ff);
+    }
+
+    function createRollerCoaster(startX, startY, startZ, color) {
+      const coasterGroup = new THREE.Group();
+
+      // Support structure
+      for (let i = 0; i < 8; i++) {
+        const supportGeometry = new THREE.BoxGeometry(0.3, 15 + Math.sin(i) * 5, 0.3);
+        const supportMaterial = new THREE.MeshStandardMaterial({ color: 0x888888 });
+        const support = new THREE.Mesh(supportGeometry, supportMaterial);
+        support.position.set(i * 4, (15 + Math.sin(i) * 5) / 2, 0);
+        support.castShadow = true;
+        coasterGroup.add(support);
+      }
+
+      // Track (using multiple segments)
+      const trackMaterial = new THREE.MeshStandardMaterial({ 
+        color: color,
+        metalness: 0.6
+      });
+
+      for (let i = 0; i < 28; i++) {
+        const x = i;
+        const y = 15 + Math.sin(i * 0.3) * 5;
+        
+        const trackGeometry = new THREE.BoxGeometry(1.2, 0.2, 0.5);
+        const track = new THREE.Mesh(trackGeometry, trackMaterial);
+        track.position.set(x, y, 0);
+        track.rotation.z = Math.sin(i * 0.3) * 0.2;
+        coasterGroup.add(track);
+
+        // Rails
+        const rail1Geometry = new THREE.CylinderGeometry(0.05, 0.05, 1.2);
+        const railMaterial = new THREE.MeshStandardMaterial({ color: 0x444444 });
+        const rail1 = new THREE.Mesh(rail1Geometry, railMaterial);
+        rail1.position.set(x, y, 0.3);
+        rail1.rotation.z = Math.PI / 2;
+        coasterGroup.add(rail1);
+
+        const rail2 = rail1.clone();
+        rail2.position.z = -0.3;
+        coasterGroup.add(rail2);
+      }
+
+      // Coaster cart
+      const cartGeometry = new THREE.BoxGeometry(1.5, 0.8, 1);
+      const cartMaterial = new THREE.MeshStandardMaterial({ color: 0xffff00 });
+      const cart = new THREE.Mesh(cartGeometry, cartMaterial);
+      cart.position.set(5, 18, 0);
+      cart.castShadow = true;
+      coasterGroup.add(cart);
+
+      coasterGroup.position.set(startX, startY, startZ);
+      scene.add(coasterGroup);
+    }
+
+    function createCarnivalGames() {
+      // Ring toss game
+      createRingTossGame(-30, 0, 20);
+      
+      // Balloon dart game
+      createBalloonDartGame(-20, 0, 22);
+      
+      // Shooting gallery
+      createShootingGallery(20, 0, 22);
+      
+      // Basketball hoop game
+      createBasketballGame(30, 0, 20);
+    }
+
+    function createRingTossGame(x, y, z) {
+      const gameGroup = new THREE.Group();
+
+      // Stand
+      const standGeometry = new THREE.BoxGeometry(3, 1, 2);
+      const standMaterial = new THREE.MeshStandardMaterial({ color: 0x8b4513 });
+      const stand = new THREE.Mesh(standGeometry, standMaterial);
+      stand.position.y = 0.5;
+      gameGroup.add(stand);
+
+      // Bottles/pegs
+      for (let i = -1; i <= 1; i++) {
+        for (let j = 0; j < 2; j++) {
+          const pegGeometry = new THREE.CylinderGeometry(0.1, 0.1, 1);
+          const pegMaterial = new THREE.MeshStandardMaterial({ 
+            color: [0xff0000, 0x00ff00, 0x0000ff][Math.abs(i) + j]
+          });
+          const peg = new THREE.Mesh(pegGeometry, pegMaterial);
+          peg.position.set(i * 0.8, 1.5, j * 0.5 - 0.25);
+          gameGroup.add(peg);
+        }
+      }
+
+      // Sign
+      const signGeometry = new THREE.PlaneGeometry(2, 0.5);
+      const signMaterial = new THREE.MeshBasicMaterial({ color: 0xffff00 });
+      const sign = new THREE.Mesh(signGeometry, signMaterial);
+      sign.position.set(0, 2.5, -1);
+      gameGroup.add(sign);
+
+      gameGroup.position.set(x, y, z);
+      scene.add(gameGroup);
+    }
+
+    function createBalloonDartGame(x, y, z) {
+      const gameGroup = new THREE.Group();
+
+      // Board
+      const boardGeometry = new THREE.BoxGeometry(4, 3, 0.2);
+      const boardMaterial = new THREE.MeshStandardMaterial({ color: 0x654321 });
+      const board = new THREE.Mesh(boardGeometry, boardMaterial);
+      board.position.set(0, 2, 0);
+      gameGroup.add(board);
+
+      // Balloons on board
+      const balloonColors = [0xff0000, 0x0000ff, 0x00ff00, 0xffff00, 0xff00ff];
+      for (let i = 0; i < 15; i++) {
+        const balloonGeometry = new THREE.SphereGeometry(0.15, 8, 8);
+        const balloonMaterial = new THREE.MeshStandardMaterial({ 
+          color: balloonColors[i % balloonColors.length]
+        });
+        const balloon = new THREE.Mesh(balloonGeometry, balloonMaterial);
+        balloon.position.set(
+          (i % 5 - 2) * 0.6,
+          2 + Math.floor(i / 5) * 0.6 - 0.6,
+          0.15
+        );
+        gameGroup.add(balloon);
+      }
+
+      // Counter
+      const counterGeometry = new THREE.BoxGeometry(4, 1, 1.5);
+      const counterMaterial = new THREE.MeshStandardMaterial({ color: 0x8b4513 });
+      const counter = new THREE.Mesh(counterGeometry, counterMaterial);
+      counter.position.set(0, 0.5, 1.5);
+      gameGroup.add(counter);
+
+      gameGroup.position.set(x, y, z);
+      scene.add(gameGroup);
+    }
+
+    function createShootingGallery(x, y, z) {
+      const gameGroup = new THREE.Group();
+
+      // Gallery stand
+      const standGeometry = new THREE.BoxGeometry(5, 2, 0.3);
+      const standMaterial = new THREE.MeshStandardMaterial({ color: 0x8b0000 });
+      const stand = new THREE.Mesh(standGeometry, standMaterial);
+      stand.position.set(0, 1.5, 0);
+      gameGroup.add(stand);
+
+      // Targets (moving ducks/cans)
+      for (let i = 0; i < 6; i++) {
+        const targetGeometry = new THREE.CylinderGeometry(0.2, 0.2, 0.4);
+        const targetMaterial = new THREE.MeshStandardMaterial({ 
+          color: i % 2 === 0 ? 0xffd700 : 0xc0c0c0
+        });
+        const target = new THREE.Mesh(targetGeometry, targetMaterial);
+        target.position.set((i - 2.5) * 0.7, 1.5, 0.2);
+        target.rotation.x = Math.PI / 2;
+        gameGroup.add(target);
+      }
+
+      // Counter
+      const counterGeometry = new THREE.BoxGeometry(5, 1, 2);
+      const counterMaterial = new THREE.MeshStandardMaterial({ color: 0x654321 });
+      const counter = new THREE.Mesh(counterGeometry, counterMaterial);
+      counter.position.set(0, 0.5, 2);
+      gameGroup.add(counter);
+
+      gameGroup.position.set(x, y, z);
+      scene.add(gameGroup);
+    }
+
+    function createBasketballGame(x, y, z) {
+      const gameGroup = new THREE.Group();
+
+      // Backboard
+      const backboardGeometry = new THREE.BoxGeometry(1.5, 1, 0.1);
+      const backboardMaterial = new THREE.MeshStandardMaterial({ color: 0xff6347 });
+      const backboard = new THREE.Mesh(backboardGeometry, backboardMaterial);
+      backboard.position.set(0, 2.5, 0);
+      gameGroup.add(backboard);
+
+      // Hoop
+      const hoopGeometry = new THREE.TorusGeometry(0.3, 0.03, 16, 32);
+      const hoopMaterial = new THREE.MeshStandardMaterial({ color: 0xff6347 });
+      const hoop = new THREE.Mesh(hoopGeometry, hoopMaterial);
+      hoop.position.set(0, 2, 0.3);
+      gameGroup.add(hoop);
+
+      // Basketballs
+      for (let i = 0; i < 3; i++) {
+        const ballGeometry = new THREE.SphereGeometry(0.15, 16, 16);
+        const ballMaterial = new THREE.MeshStandardMaterial({ color: 0xff6600 });
+        const ball = new THREE.Mesh(ballGeometry, ballMaterial);
+        ball.position.set(i * 0.4 - 0.4, 0.8, 1.5);
+        gameGroup.add(ball);
+      }
+
+      // Stand
+      const standGeometry = new THREE.BoxGeometry(2, 1, 2);
+      const standMaterial = new THREE.MeshStandardMaterial({ color: 0x8b4513 });
+      const stand = new THREE.Mesh(standGeometry, standMaterial);
+      stand.position.set(0, 0.5, 1);
+      gameGroup.add(stand);
+
+      gameGroup.position.set(x, y, z);
+      scene.add(gameGroup);
     }
 
     function onKeyDown(event) {
