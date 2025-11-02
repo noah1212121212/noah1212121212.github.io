@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Wallet Showroom</title>
+  <script src="https://aframe.io/releases/1.4.2/aframe.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/gh/donmccurdy/aframe-extras@v6.1.1/dist/aframe-extras.min.js"></script>
+</head>
+<body>
+  <a-scene>
+    <!-- Camera -->
+    <a-entity id="rig" position="0 1.6 5" movement-controls="fly: false; speed: 0.15">
+      <a-entity camera look-controls wasd-controls="acceleration: 50"></a-entity>
+    </a-entity>
+
+    <!-- Lights -->
+    <a-light type="ambient" intensity="0.6"></a-light>
+    <a-light type="point" position="3 4 2" color="#FF6B35" intensity="1.5"></a-light>
+    <a-light type="point" position="-3 3 -2" color="#4ECDC4" intensity="1.5"></a-light>
+    <a-light type="point" position="0 5 0" color="#FFD700" intensity="1"></a-light>
+
+    <!-- Sky -->
+    <a-sky color="#1a0033"></a-sky>
+
+    <!-- Floor -->
+    <a-plane position="0 0 0" rotation="-90 0 0" width="30" height="30" 
+             color="#2d1b69" shadow="receive: true"></a-plane>
+
+    <!-- Platform -->
+    <a-cylinder position="0 0.05 -3" radius="1.5" height="0.1" color="#4ECDC4" 
+                material="emissive: #4ECDC4; emissiveIntensity: 0.5"></a-cylinder>
+    
+    <!-- Holographic ring -->
+    <a-ring position="0 1.5 -3" radius-inner="1.8" radius-outer="2" rotation="-90 0 0" 
+            color="#FF6B35" opacity="0.4"
+            animation="property: rotation; to: -90 360 0; loop: true; dur: 15000"></a-ring>
+
+    <!-- YOUR WALLET MODEL -->
+    <a-entity 
+      id="wallet"
+      gltf-model="https://vlyzifpqemfanxllnmuf.supabase.co/storage/v1/object/public/files/Noah/3d/wallet.glb"
+      position="0 2 -3"
+      scale="8 8 8"
+      rotation="0 0 0"
+      shadow="cast: true"
+      animation="property: rotation; to: 0 360 0; loop: true; dur: 20000; easing: linear"
+      animation__hover="property: position; to: 0 2.3 -3; dir: alternate; loop: true; dur: 2500; easing: easeInOutSine">
+    </a-entity>
+
+    <!-- Floating Crystals -->
+    <a-octahedron position="3 2 -2" radius="0.3" color="#9B59B6" 
+                  material="emissive: #9B59B6; emissiveIntensity: 0.6"
+                  animation="property: rotation; to: 360 360 360; loop: true; dur: 10000"
+                  animation__float="property: position; to: 3 2.5 -2; dir: alternate; loop: true; dur: 3000"></a-octahedron>
+
+    <a-octahedron position="-3 2 -4" radius="0.25" color="#E74C3C" 
+                  material="emissive: #E74C3C; emissiveIntensity: 0.6"
+                  animation="property: rotation; to: 360 360 360; loop: true; dur: 12000"
+                  animation__float="property: position; to: -3 2.5 -4; dir: alternate; loop: true; dur: 3500"></a-octahedron>
+
+    <a-octahedron position="2 1.5 -5" radius="0.2" color="#3498DB" 
+                  material="emissive: #3498DB; emissiveIntensity: 0.6"
+                  animation="property: rotation; to: 360 360 360; loop: true; dur: 8000"
+                  animation__float="property: position; to: 2 2 -5; dir: alternate; loop: true; dur: 2500"></a-octahedron>
+
+    <a-octahedron position="-2 1.8 -1" radius="0.35" color="#F39C12" 
+                  material="emissive: #F39C12; emissiveIntensity: 0.6"
+                  animation="property: rotation; to: 360 360 360; loop: true; dur: 11000"
+                  animation__float="property: position; to: -2 2.3 -1; dir: alternate; loop: true; dur: 3200"></a-octahedron>
+
+    <!-- Neon Pillars -->
+    <a-entity position="5 0 -5">
+      <a-box width="0.5" height="4" depth="0.5" color="#FF6B35" 
+             material="emissive: #FF6B35; emissiveIntensity: 0.4"></a-box>
+      <a-sphere position="0 2.5 0" radius="0.3" color="#FFD700" 
+                material="emissive: #FFD700; emissiveIntensity: 1; shader: flat"></a-sphere>
+    </a-entity>
+
+    <a-entity position="-5 0 -5">
+      <a-box width="0.5" height="4" depth="0.5" color="#4ECDC4" 
+             material="emissive: #4ECDC4; emissiveIntensity: 0.4"></a-box>
+      <a-sphere position="0 2.5 0" radius="0.3" color="#9B59B6" 
+                material="emissive: #9B59B6; emissiveIntensity: 1; shader: flat"></a-sphere>
+    </a-entity>
+
+    <!-- Display Screens -->
+    <a-entity position="4 2 -3" rotation="0 -30 0">
+      <a-plane width="2" height="1.5" color="#000033" opacity="0.8"></a-plane>
+      <a-text value="PREMIUM\nCOLLECTION" align="center" color="#4ECDC4" width="4" position="0 0 0.01"></a-text>
+    </a-entity>
+
+    <a-entity position="-4 2 -3" rotation="0 30 0">
+      <a-plane width="2" height="1.5" color="#000033" opacity="0.8"></a-plane>
+      <a-text value="INTERACTIVE\nSHOWROOM" align="center" color="#FF6B35" width="4" position="0 0 0.01"></a-text>
+    </a-entity>
+
+    <!-- Floating Particles -->
+    <a-entity position="0 3 -3">
+      <a-sphere position="1 0 0" radius="0.05" color="#FFD700" material="shader: flat; emissive: #FFD700"
+                animation="property: object3D.position.x; to: -1; dir: alternate; loop: true; dur: 5000"></a-sphere>
+      <a-sphere position="-0.5 0.5 0.5" radius="0.05" color="#4ECDC4" material="shader: flat; emissive: #4ECDC4"
+                animation="property: object3D.position.z; to: -0.5; dir: alternate; loop: true; dur: 4000"></a-sphere>
+      <a-sphere position="0.5 -0.3 -0.5" radius="0.05" color="#FF6B35" material="shader: flat; emissive: #FF6B35"
+                animation="property: object3D.position.x; to: -0.5; dir: alternate; loop: true; dur: 4500"></a-sphere>
+    </a-entity>
+
+    <!-- Back Wall -->
+    <a-box position="0 2 -8" width="16" height="4" depth="0.2" color="#0a0015"></a-box>
+    
+    <!-- Title -->
+    <a-text value="WALLET SHOWROOM" position="0 3.5 -7.8" align="center" color="#FFD700" width="10"
+            material="shader: flat; emissive: #FFD700; emissiveIntensity: 0.8"></a-text>
+
+  </a-scene>
+
+  <script>
+    // Make wallet draggable with mouse - stops spinning when grabbed
+    const wallet = document.querySelector('#wallet');
+    let isDragging = false;
+    let previousMousePosition = { x: 0, y: 0 };
+    
+    wallet.addEventListener('mousedown', function(e) {
+      isDragging = true;
+      // Stop the rotation animation when grabbed
+      wallet.removeAttribute('animation');
+      wallet.removeAttribute('animation__hover');
+    });
+
+    document.addEventListener('mouseup', function() {
+      if (isDragging) {
+        isDragging = false;
+        // Restart the rotation animation when released
+        wallet.setAttribute('animation', 'property: rotation; to: 0 360 0; loop: true; dur: 20000; easing: linear');
+        wallet.setAttribute('animation__hover', 'property: position; to: 0 1.8 -3; dir: alternate; loop: true; dur: 2500; easing: easeInOutSine');
+      }
+    });
+
+    document.addEventListener('mousemove', function(e) {
+      if (isDragging) {
+        const deltaX = e.clientX - previousMousePosition.x;
+        const deltaY = e.clientY - previousMousePosition.y;
+        
+        const rotation = wallet.getAttribute('rotation');
+        wallet.setAttribute('rotation', {
+          x: rotation.x - deltaY * 0.5,
+          y: rotation.y + deltaX * 0.5,
+          z: rotation.z
+        });
+      }
+      
+      previousMousePosition = {
+        x: e.clientX,
+        y: e.clientY
+      };
+    });
+  </script>
+</body>
+</html>
