@@ -1,0 +1,214 @@
+import React, { useState } from 'react';
+import { MapPin, Search, Plus, X, Filter } from 'lucide-react';
+
+const GreenSyracuse = () => {
+  const [selectedCategory, setSelectedCategory] = useState('all');
+  const [selectedLocation, setSelectedLocation] = useState(null);
+  const [showSubmitForm, setShowSubmitForm] = useState(false);
+  const [formData, setFormData] = useState({ name: '', category: 'recycling', address: '' });
+
+  const locations = [
+    { id: 1, name: 'Syracuse Recycling Center', category: 'recycling', address: '123 Main St', hours: '8am-5pm', desc: 'Full service recycling for all materials' },
+    { id: 2, name: 'GreenThrift Downtown', category: 'thrift', address: '456 Salina St', hours: '10am-6pm', desc: 'Secondhand clothing and furniture' },
+    { id: 3, name: 'Compost Hub', category: 'compost', address: '789 Park Ave', hours: '7am-7pm', desc: 'Drop-off for food scraps and yard waste' },
+    { id: 4, name: 'Community Donation Center', category: 'donation', address: '321 Warren St', hours: '9am-5pm', desc: 'Accepts gently used household items' },
+    { id: 5, name: 'Eco-Friendly Market', category: 'shopping', address: '654 Genesee St', hours: '11am-7pm', desc: 'Sustainable products and bulk items' },
+    { id: 6, name: 'Westside Recycling', category: 'recycling', address: '111 Woodland Ave', hours: '8am-4pm', desc: 'Electronics and specialty recycling' },
+    { id: 7, name: 'Vintage & More', category: 'thrift', address: '222 South Ave', hours: '10am-5pm', desc: 'Curated vintage and upcycled goods' },
+    { id: 8, name: 'Green Waste Solutions', category: 'compost', address: '333 North St', hours: '6am-8pm', desc: 'Professional composting service' },
+    { id: 9, name: 'Buy Nothing Store', category: 'donation', address: '444 East St', hours: '12pm-6pm', desc: 'Free exchange community items' },
+    { id: 10, name: 'Sustainable Living Co.', category: 'shopping', address: '555 West St', hours: '9am-9pm', desc: 'Zero-waste household essentials' },
+  ];
+
+  const categories = [
+    { id: 'all', label: 'All Resources', color: 'bg-gray-600' },
+    { id: 'recycling', label: 'Recycling', color: 'bg-blue-600' },
+    { id: 'thrift', label: 'Thrift Shops', color: 'bg-purple-600' },
+    { id: 'compost', label: 'Compost', color: 'bg-green-600' },
+    { id: 'donation', label: 'Donations', color: 'bg-orange-600' },
+    { id: 'shopping', label: 'Eco Shopping', color: 'bg-teal-600' },
+  ];
+
+  const filtered = selectedCategory === 'all' 
+    ? locations 
+    : locations.filter(l => l.category === selectedCategory);
+
+  const handleSubmit = () => {
+    if (formData.name.trim()) {
+      alert(`Thank you! "${formData.name}" has been submitted for review.`);
+      setFormData({ name: '', category: 'recycling', address: '' });
+      setShowSubmitForm(false);
+    }
+  };
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-emerald-50 to-blue-50">
+      {/* Header */}
+      <div className="bg-white border-b border-gray-200 sticky top-0 z-10">
+        <div className="max-w-6xl mx-auto px-4 py-6">
+          <div className="flex items-center gap-2 mb-4">
+            <MapPin className="w-8 h-8 text-emerald-600" />
+            <h1 className="text-3xl font-bold text-gray-900">GreenSyracuse</h1>
+          </div>
+          <p className="text-gray-600">Your guide to sustainable resources in Syracuse</p>
+        </div>
+      </div>
+
+      <div className="max-w-6xl mx-auto px-4 py-8">
+        {/* Filter Bar */}
+        <div className="flex gap-2 mb-8 flex-wrap">
+          {categories.map(cat => (
+            <button
+              key={cat.id}
+              onClick={() => setSelectedCategory(cat.id)}
+              className={`px-4 py-2 rounded-full text-sm font-medium transition ${
+                selectedCategory === cat.id
+                  ? `${cat.color} text-white`
+                  : 'bg-white text-gray-700 border border-gray-300 hover:border-gray-400'
+              }`}
+            >
+              {cat.label}
+            </button>
+          ))}
+        </div>
+
+        {/* Main Content */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* List */}
+          <div className="lg:col-span-1 space-y-3 max-h-96 overflow-y-auto">
+            {filtered.length > 0 ? (
+              filtered.map(location => (
+                <button
+                  key={location.id}
+                  onClick={() => setSelectedLocation(location)}
+                  className={`w-full p-4 rounded-lg text-left transition border-2 ${
+                    selectedLocation?.id === location.id
+                      ? 'border-emerald-600 bg-emerald-50'
+                      : 'border-gray-200 bg-white hover:border-gray-300'
+                  }`}
+                >
+                  <div className="font-semibold text-gray-900 text-sm">{location.name}</div>
+                  <div className="text-xs text-gray-500 mt-1">{location.address}</div>
+                </button>
+              ))
+            ) : (
+              <div className="p-4 text-center text-gray-500">No locations found</div>
+            )}
+          </div>
+
+          {/* Details Panel */}
+          <div className="lg:col-span-2">
+            {selectedLocation ? (
+              <div className="bg-white rounded-lg border-2 border-emerald-200 p-6">
+                <h2 className="text-2xl font-bold text-gray-900 mb-2">{selectedLocation.name}</h2>
+                <div className="space-y-3 mb-6">
+                  <div className="flex items-start gap-2">
+                    <MapPin className="w-5 h-5 text-emerald-600 mt-0.5 flex-shrink-0" />
+                    <div>
+                      <div className="text-sm font-medium text-gray-700">Address</div>
+                      <div className="text-gray-600">{selectedLocation.address}</div>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-2">
+                    <div className="w-5 h-5 text-emerald-600 mt-0.5 flex-shrink-0">🕐</div>
+                    <div>
+                      <div className="text-sm font-medium text-gray-700">Hours</div>
+                      <div className="text-gray-600">{selectedLocation.hours}</div>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-2">
+                    <div className="w-5 h-5 text-emerald-600 mt-0.5 flex-shrink-0">ℹ️</div>
+                    <div>
+                      <div className="text-sm font-medium text-gray-700">About</div>
+                      <div className="text-gray-600">{selectedLocation.desc}</div>
+                    </div>
+                  </div>
+                </div>
+                <div className="inline-block px-3 py-1 rounded-full text-xs font-medium bg-emerald-100 text-emerald-700">
+                  {categories.find(c => c.id === selectedLocation.category)?.label}
+                </div>
+              </div>
+            ) : (
+              <div className="bg-white rounded-lg border-2 border-dashed border-gray-300 p-12 text-center">
+                <MapPin className="w-12 h-12 text-gray-400 mx-auto mb-3" />
+                <p className="text-gray-500">Select a location to see details</p>
+              </div>
+            )}
+
+            {/* Submit Button */}
+            <button
+              onClick={() => setShowSubmitForm(!showSubmitForm)}
+              className="mt-6 w-full flex items-center justify-center gap-2 px-4 py-3 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition font-medium"
+            >
+              <Plus className="w-5 h-5" />
+              Submit a Green Spot
+            </button>
+
+            {/* Submit Form */}
+            {showSubmitForm && (
+              <div className="mt-4 bg-white rounded-lg border-2 border-emerald-200 p-6">
+                <div className="flex justify-between items-center mb-4">
+                  <h3 className="font-bold text-gray-900">Add a Location</h3>
+                  <button
+                    onClick={() => setShowSubmitForm(false)}
+                    className="text-gray-500 hover:text-gray-700"
+                  >
+                    <X className="w-5 h-5" />
+                  </button>
+                </div>
+                <div className="space-y-4">
+                  <input
+                    type="text"
+                    placeholder="Location name"
+                    value={formData.name}
+                    onChange={(e) => setFormData({...formData, name: e.target.value})}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:border-emerald-600"
+                  />
+                  <select
+                    value={formData.category}
+                    onChange={(e) => setFormData({...formData, category: e.target.value})}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:border-emerald-600"
+                  >
+                    <option value="recycling">Recycling</option>
+                    <option value="thrift">Thrift Shop</option>
+                    <option value="compost">Compost</option>
+                    <option value="donation">Donation</option>
+                    <option value="shopping">Eco Shopping</option>
+                  </select>
+                  <input
+                    type="text"
+                    placeholder="Address"
+                    value={formData.address}
+                    onChange={(e) => setFormData({...formData, address: e.target.value})}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:border-emerald-600"
+                  />
+                  <button
+                    onClick={handleSubmit}
+                    className="w-full px-3 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition text-sm font-medium"
+                  >
+                    Submit
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Stats */}
+        <div className="mt-12 grid grid-cols-2 md:grid-cols-5 gap-4">
+          {categories.map(cat => {
+            const count = cat.id === 'all' ? locations.length : locations.filter(l => l.category === cat.id).length;
+            return (
+              <div key={cat.id} className="bg-white rounded-lg p-4 text-center border border-gray-200">
+                <div className="text-2xl font-bold text-emerald-600">{count}</div>
+                <div className="text-xs text-gray-600 mt-1">{cat.label}</div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default GreenSyracuse;
