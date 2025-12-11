@@ -1,0 +1,872 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GreenSyracuse - Sustainable Living Made Easy</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-green: #4CAF50;
+            --light-green: #81C784;
+            --accent-green: #66BB6A;
+            --bright-orange: #FF9800;
+            --dark-orange: #F57C00;
+            --dark-bg: #1a1a1a;
+            --light-bg: #f9fdf9;
+            --text-dark: #333;
+            --text-light: #666;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            line-height: 1.6;
+            color: var(--text-dark);
+        }
+
+        nav {
+            background: linear-gradient(135deg, var(--primary-green) 0%, var(--accent-green) 100%);
+            color: white;
+            padding: 1.5rem 0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            text-align: center;
+        }
+
+        .logo {
+            font-size: 2rem;
+            font-weight: bold;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .logo span {
+            color: var(--bright-orange);
+        }
+
+        .hero {
+            background: linear-gradient(135deg, var(--primary-green) 0%, var(--accent-green) 50%, var(--bright-orange) 100%);
+            color: white;
+            padding: 6rem 2rem;
+            text-align: center;
+        }
+
+        .hero h1 {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .hero p {
+            font-size: 1.3rem;
+            opacity: 0.95;
+        }
+
+        section {
+            padding: 4rem 2rem;
+        }
+
+        .section-dark {
+            background: var(--light-bg);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        h2 {
+            color: var(--primary-green);
+            font-size: 2.5rem;
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+
+        h3 {
+            color: var(--primary-green);
+            font-size: 1.8rem;
+            margin: 2rem 0 1rem 0;
+        }
+
+        .map-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .map-header p {
+            color: var(--text-light);
+            font-size: 1.1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .filters {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin-bottom: 2rem;
+        }
+
+        .filter-btn {
+            padding: 0.6rem 1.2rem;
+            border: 2px solid var(--primary-green);
+            background: white;
+            color: var(--primary-green);
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 500;
+            font-size: 1rem;
+        }
+
+        .filter-btn.active {
+            background: var(--primary-green);
+            color: white;
+        }
+
+        .filter-btn:hover {
+            background: var(--bright-orange);
+            border-color: var(--bright-orange);
+            color: white;
+        }
+
+        .map-container {
+            position: relative;
+            height: 650px;
+            background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+            border-radius: 15px;
+            box-shadow: 0 5px 30px rgba(0,0,0,0.15);
+            margin-bottom: 3rem;
+            overflow: hidden;
+        }
+
+        .map-grid {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                repeating-linear-gradient(0deg, rgba(76, 175, 80, 0.1) 0px, rgba(76, 175, 80, 0.1) 1px, transparent 1px, transparent 50px),
+                repeating-linear-gradient(90deg, rgba(76, 175, 80, 0.1) 0px, rgba(76, 175, 80, 0.1) 1px, transparent 1px, transparent 50px);
+        }
+
+        .map-street {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.6);
+        }
+
+        .street-horizontal {
+            height: 3px;
+            width: 100%;
+        }
+
+        .street-vertical {
+            width: 3px;
+            height: 100%;
+        }
+
+        .map-pin {
+            position: absolute;
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            border: 3px solid white;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3rem;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.3);
+            transform: translate(-50%, -50%);
+        }
+
+        .map-pin:hover {
+            transform: translate(-50%, -50%) scale(1.3);
+            z-index: 100;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.5);
+        }
+
+        .map-pin.recycling {
+            background: #4CAF50;
+        }
+
+        .map-pin.thrift {
+            background: #2196F3;
+        }
+
+        .map-pin.donation {
+            background: #E91E63;
+        }
+
+        .map-pin.compost {
+            background: #795548;
+        }
+
+        .map-pin.market {
+            background: #FF9800;
+        }
+
+        .pin-tooltip {
+            position: absolute;
+            background: white;
+            padding: 1rem;
+            border-radius: 8px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.3);
+            min-width: 280px;
+            max-width: 320px;
+            z-index: 1000;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.3s;
+            bottom: 55px;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .map-pin:hover .pin-tooltip {
+            opacity: 1;
+        }
+
+        .pin-tooltip h4 {
+            color: var(--primary-green);
+            margin-bottom: 0.5rem;
+            font-size: 1.1rem;
+        }
+
+        .pin-tooltip p {
+            color: var(--text-light);
+            font-size: 0.85rem;
+            margin: 0.3rem 0;
+        }
+
+        .pin-tooltip .category-tag {
+            display: inline-block;
+            padding: 0.2rem 0.6rem;
+            background: var(--bright-orange);
+            color: white;
+            border-radius: 10px;
+            font-size: 0.75rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .map-legend {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: white;
+            padding: 1rem;
+            border-radius: 10px;
+            box-shadow: 0 3px 15px rgba(0,0,0,0.2);
+            z-index: 10;
+        }
+
+        .legend-title {
+            font-weight: bold;
+            color: var(--primary-green);
+            margin-bottom: 0.5rem;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin: 0.3rem 0;
+            font-size: 0.9rem;
+        }
+
+        .legend-color {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            border: 2px solid white;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+
+        .ai-summary-box {
+            background: linear-gradient(135deg, var(--light-bg) 0%, #fff 100%);
+            padding: 2.5rem;
+            border-radius: 15px;
+            border-left: 6px solid var(--primary-green);
+            border-right: 6px solid var(--bright-orange);
+            margin: 2rem 0 3rem 0;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+        }
+
+        .ai-summary-box h3 {
+            color: var(--primary-green);
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-top: 0;
+        }
+
+        .ai-summary-box p {
+            margin-bottom: 1.2rem;
+            line-height: 1.9;
+            color: var(--text-dark);
+            font-size: 1.05rem;
+        }
+
+        .locations-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .location-card {
+            background: white;
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: 0 3px 15px rgba(0,0,0,0.1);
+            border-top: 5px solid var(--primary-green);
+            transition: all 0.3s;
+        }
+
+        .location-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 30px rgba(0,0,0,0.15);
+            border-top-color: var(--bright-orange);
+        }
+
+        .location-card h3 {
+            color: var(--primary-green);
+            margin-bottom: 0.8rem;
+            font-size: 1.5rem;
+            margin-top: 0;
+        }
+
+        .category-badge {
+            display: inline-block;
+            padding: 0.4rem 1rem;
+            background: var(--bright-orange);
+            color: white;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+            font-weight: 600;
+            text-transform: capitalize;
+        }
+
+        .detail-section {
+            margin: 1rem 0;
+        }
+
+        .detail-section strong {
+            color: var(--primary-green);
+            display: block;
+            margin-bottom: 0.3rem;
+        }
+
+        .detail-section p {
+            color: var(--text-light);
+            line-height: 1.7;
+        }
+
+        .about-content p {
+            margin-bottom: 1.2rem;
+            line-height: 1.8;
+            color: var(--text-light);
+            font-size: 1.05rem;
+        }
+
+        .mission-box {
+            background: var(--light-bg);
+            padding: 2rem;
+            border-radius: 10px;
+            border-left: 4px solid var(--primary-green);
+            border-right: 4px solid var(--bright-orange);
+            margin: 2rem 0;
+        }
+
+        .mission-box h3 {
+            margin-top: 0;
+        }
+
+        .form-container {
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: var(--primary-green);
+            font-weight: 500;
+        }
+
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            padding: 0.8rem;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            font-size: 1rem;
+            font-family: inherit;
+            transition: border-color 0.3s;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: var(--primary-green);
+        }
+
+        .form-group textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+
+        .submit-btn {
+            background: var(--bright-orange);
+            color: white;
+            padding: 1rem 2.5rem;
+            border: none;
+            border-radius: 50px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: block;
+            margin: 2rem auto 0;
+        }
+
+        .submit-btn:hover {
+            background: var(--dark-orange);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+        }
+
+        footer {
+            background: linear-gradient(135deg, var(--primary-green) 0%, var(--accent-green) 100%);
+            color: white;
+            text-align: center;
+            padding: 2rem;
+            margin-top: 4rem;
+        }
+
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 2rem;
+            }
+
+            .hero p {
+                font-size: 1.1rem;
+            }
+
+            h2 {
+                font-size: 2rem;
+            }
+
+            .map-container {
+                height: 400px;
+            }
+
+            .locations-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .map-legend {
+                font-size: 0.8rem;
+                padding: 0.7rem;
+            }
+
+            .pin-tooltip {
+                min-width: 200px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <div class="nav-container">
+            <div class="logo">🌱 Green<span>Syracuse</span></div>
+        </div>
+    </nav>
+
+    <section class="hero">
+        <h1>Sustainable Living Made Easy</h1>
+        <p>Discover recycling centers, thrift stores, donation hubs, and composting sites all in one place</p>
+    </section>
+
+    <section id="map">
+        <div class="container">
+            <div class="map-header">
+                <h2>Interactive Map of Syracuse</h2>
+                <p>Hover over the color-coded pins to see location details and hours!</p>
+                <div class="filters">
+                    <button class="filter-btn active" onclick="filterMap('all')">All Locations</button>
+                    <button class="filter-btn" onclick="filterMap('recycling')">Recycling</button>
+                    <button class="filter-btn" onclick="filterMap('thrift')">Thrift Stores</button>
+                    <button class="filter-btn" onclick="filterMap('donation')">Donation Centers</button>
+                    <button class="filter-btn" onclick="filterMap('compost')">Compost Hubs</button>
+                    <button class="filter-btn" onclick="filterMap('market')">Eco Markets</button>
+                </div>
+            </div>
+            
+            <div class="map-container">
+                <div class="map-grid"></div>
+                
+                <div class="map-street street-horizontal" style="top: 20%;"></div>
+                <div class="map-street street-horizontal" style="top: 50%;"></div>
+                <div class="map-street street-horizontal" style="top: 75%;"></div>
+                <div class="map-street street-vertical" style="left: 25%;"></div>
+                <div class="map-street street-vertical" style="left: 50%;"></div>
+                <div class="map-street street-vertical" style="left: 75%;"></div>
+                
+                <div class="map-legend">
+                    <div class="legend-title">Legend</div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background: #4CAF50;"></div>
+                        <span>Recycling</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background: #2196F3;"></div>
+                        <span>Thrift Store</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background: #E91E63;"></div>
+                        <span>Donation</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background: #795548;"></div>
+                        <span>Compost</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background: #FF9800;"></div>
+                        <span>Eco Market</span>
+                    </div>
+                </div>
+                
+                <div id="mapPins"></div>
+            </div>
+        </div>
+    </section>
+
+    <section id="locations" class="section-dark">
+        <div class="container">
+            <h2>All Sustainable Resources in Syracuse</h2>
+            
+            <div class="ai-summary-box">
+                <h3>🤖 AI-Generated Overview</h3>
+                <p>Syracuse offers a comprehensive network of sustainable living resources designed to make eco-friendly choices accessible to all residents. Our platform has identified and cataloged ten essential locations spanning five key categories: recycling centers, thrift stores, donation hubs, composting facilities, and eco-friendly markets. Together, these locations form a robust ecosystem that supports the community's environmental goals while providing practical, convenient options for everyday sustainable living.</p>
+                
+                <p>The recycling infrastructure in Syracuse is particularly strong, with facilities like the Syracuse Recycling Center and Westside Recycling offering comprehensive services. The Syracuse Recycling Center serves as the city's primary recycling hub, accepting everything from standard recyclables like paper and plastics to more challenging items such as electronics and batteries. Westside Recycling complements this by specializing in hard-to-recycle materials including styrofoam and light bulbs, filling critical gaps in the recycling chain. Both facilities require proof of residency, ensuring that Syracuse residents have priority access to these essential services.</p>
+                
+                <p>For those interested in composting, Syracuse provides multiple options that cater to different needs and schedules. The Compost Hub on Park Street offers a convenient drop-off service three days per week, accepting both food scraps and yard waste. What makes this facility particularly valuable is their free finished compost program, allowing residents to complete the sustainability cycle by using nutrient-rich compost in their own gardens. Green Waste Solutions takes a more commercial approach while still serving residential customers, operating throughout the weekday and processing larger volumes of organic materials. This dual approach ensures that whether you're composting kitchen scraps from a small apartment or managing yard waste from a larger property, there's a solution that fits your needs.</p>
+                
+                <p>The secondhand economy thrives in Syracuse through our featured thrift stores and donation centers. GreenThrift Downtown and Vintage and More represent two distinct approaches to sustainable fashion and household goods. GreenThrift Downtown operates as a traditional thrift store with extensive hours and a wide variety of items, making sustainable shopping accessible seven days a week. Vintage and More takes a more curated approach, specializing in vintage clothing and accessories, and offers student discounts to make sustainable fashion even more accessible to the university community. The Community Donation Center and Buy Nothing Store provide complementary services on the donation side, with the Community Donation Center offering traditional donation services plus free pickup for large items, while the Buy Nothing Store operates on a gift economy model where community members can give and take freely without any exchange of money.</p>
+                
+                <p>Syracuse's eco-friendly markets represent the cutting edge of sustainable shopping. The Eco-Friendly Market on Erie Boulevard operates as a full-service grocery store featuring organic produce, bulk foods, and zero-waste shopping options. Their partnerships with local vendors ensure that money spent supports the regional economy while reducing transportation emissions. Sustainable Living Co. complements this by focusing on household essentials, offering refill stations for cleaning products and a carefully curated selection of reusable goods and eco-friendly alternatives to single-use items. Together, these markets demonstrate that sustainable shopping doesn't require sacrifice—instead, they offer high-quality products that align with environmental values.</p>
+            </div>
+
+            <h3 style="text-align: center; margin-top: 3rem;">Complete Location Directory</h3>
+            
+            <div class="locations-grid" id="allLocationsList"></div>
+        </div>
+    </section>
+
+    <section id="about">
+        <div class="container">
+            <h2>About GreenSyracuse</h2>
+            
+            <div class="mission-box">
+                <h3>Our Mission</h3>
+                <p>GreenSyracuse exists to make sustainable living accessible to everyone in Syracuse. We believe that environmental action shouldn't be complicated or time-consuming. By centralizing information about local sustainable resources, we're removing barriers and empowering residents to make eco-friendly choices every day.</p>
+            </div>
+
+            <div class="about-content">
+                <h3>The Problem We're Solving</h3>
+                <p>Finding information about recycling centers, donation hubs, thrift stores, and composting sites in Syracuse has always been frustrating. Information is scattered across city websites, social media pages, and outdated directories. Hours change, locations close, and new sustainable businesses open—but there's no single place to find accurate, up-to-date information.</p>
+
+                <p>This difficulty leads many well-intentioned residents to give up on sustainable practices simply because the initial research feels overwhelming. GreenSyracuse changes that.</p>
+
+                <h3>How It Works</h3>
+                <p>GreenSyracuse uses AI-assisted technology to gather and organize information from multiple online sources. Our platform displays locations on an interactive map with color-coded categories, making it easy to find exactly what you need. Each location includes essential details like hours, accepted items, addresses, and contact information.</p>
+
+                <p>But we're more than just a database. GreenSyracuse is community-powered. Users can submit new locations, report changes, and help keep information current. This collaborative approach ensures the platform remains accurate and continues to grow with the community's needs.</p>
+
+                <h3>Field Testing Results</h3>
+                <p>Our initial field test with 10 locations showed remarkable results. 92% of users reported that our AI summaries and categorization improved clarity. Search times were significantly reduced compared to traditional methods like Google searches or browsing city websites. Users discovered locations they never knew existed and expressed increased confidence in taking sustainable actions.</p>
+
+                <h3>Looking Forward</h3>
+                <p>GreenSyracuse started with 10 locations and continues to expand. Our vision is to become the go-to resource for sustainable living in Syracuse, covering every neighborhood and including additional categories like eco-events and green service providers. As we grow, we're building partnerships with local organizations to increase our reach and impact.</p>
+
+                <p>Together, we're making Syracuse greener, one resource at a time.</p>
+            </div>
+        </div>
+    </section>
+
+    <section id="contribute" class="section-dark">
+        <div class="container">
+            <h2>Contribute to GreenSyracuse</h2>
+            <p style="text-align: center; color: var(--text-light); margin-bottom: 2rem;">Help keep GreenSyracuse accurate and comprehensive! Submit new locations, report changes, or update existing information.</p>
+
+            <div class="form-container">
+                <form id="contributeForm" onsubmit="handleSubmit(event)">
+                    <div class="form-group">
+                        <label>Submission Type</label>
+                        <select required>
+                            <option value="">Choose one...</option>
+                            <option value="new">New Location</option>
+                            <option value="update">Update Existing Location</option>
+                            <option value="error">Report an Error</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Business/Location Name</label>
+                        <input type="text" required placeholder="Enter the name of the location">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Address</label>
+                        <input type="text" required placeholder="Street address in Syracuse">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Category</label>
+                        <select required>
+                            <option value="">Choose category...</option>
+                            <option value="recycling">Recycling Center</option>
+                            <option value="thrift">Thrift Store</option>
+                            <option value="donation">Donation Center</option>
+                            <option value="compost">Compost Hub</option>
+                            <option value="market">Eco-Friendly Market</option>
+                            <option value="other">Other</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Hours of Operation</label>
+                        <input type="text" placeholder="e.g., Mon-Fri 9am-5pm">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Additional Details</label>
+                        <textarea placeholder="What items do they accept? Any special requirements? Other useful information..."></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Your Email (optional)</label>
+                        <input type="email" placeholder="In case we need to follow up">
+                    </div>
+
+                    <button type="submit" class="submit-btn">Submit Contribution</button>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <p>&copy; 2024 GreenSyracuse. Making sustainable living accessible to everyone.</p>
+        <p style="margin-top: 0.5rem;">📧 info@greensyracuse.org | 💬 @GreenSyracuse</p>
+    </footer>
+
+    <script>
+        const locations = [
+            {
+                name: "Syracuse Recycling Center",
+                category: "recycling",
+                address: "6680 Fly Rd, East Syracuse, NY 13057",
+                position: { x: 72, y: 28 },
+                hours: "Mon-Sat 7:00 AM - 3:00 PM, Closed Sunday",
+                details: "Comprehensive recycling facility accepting paper, cardboard, plastics #1-7, glass, metals, electronics, and batteries. Proof of Syracuse residency required. Free drop-off service for residents.",
+                icon: "♻️"
+            },
+            {
+                name: "GreenThrift Downtown",
+                category: "thrift",
+                address: "312 S Clinton St, Syracuse, NY 13202",
+                position: { x: 48, y: 52 },
+                hours: "Mon-Sat 10:00 AM - 7:00 PM, Sun 12:00 PM - 5:00 PM",
+                details: "Quality secondhand clothing, furniture, and household items. Wide selection of vintage finds and modern pieces. Donations accepted during all business hours. Supporting local sustainability through reuse.",
+                icon: "👕"
+            },
+            {
+                name: "Compost Hub",
+                category: "compost",
+                address: "2009 Park St, Syracuse, NY 13208",
+                position: { x: 55, y: 32 },
+                hours: "Tue, Thu, Sat 8:00 AM - 2:00 PM",
+                details: "Community composting center for food scraps and yard waste. Free finished compost available for pickup by appointment. Educational workshops on composting best practices offered monthly.",
+                icon: "🌿"
+            },
+            {
+                name: "Community Donation Center",
+                category: "donation",
+                address: "501 Oswego St, Syracuse, NY 13204",
+                position: { x: 35, y: 45 },
+                hours: "Mon-Fri 9:00 AM - 6:00 PM, Sat 9:00 AM - 4:00 PM",
+                details: "Accepting donations of clothing, furniture, electronics, and household goods. Free pickup service available for large items. All proceeds support local community programs and job training initiatives.",
+                icon: "📦"
+            },
+            {
+                name: "Eco-Friendly Market",
+                category: "market",
+                address: "3400 Erie Blvd E, Syracuse, NY 13214",
+                position: { x: 78, y: 42 },
+                hours: "Daily 8:00 AM - 8:00 PM",
+                details: "Full-service grocery featuring organic produce, bulk foods, and zero-waste shopping options. Local vendor partnerships support regional sustainability. Refill stations for household products and reusable container discounts.",
+                icon: "🛒"
+            },
+            {
+                name: "Westside Recycling",
+                category: "recycling",
+                address: "1642 W Genesee St, Syracuse, NY 13204",
+                position: { x: 28, y: 50 },
+                hours: "Tue-Sat 8:00 AM - 4:00 PM",
+                details: "Specialized recycling services for hard-to-recycle materials including styrofoam, light bulbs, and textiles. Syracuse residency required. Small fee for certain specialty items.",
+                icon: "♻️"
+            },
+            {
+                name: "Vintage and More",
+                category: "thrift",
+                address: "750 S Crouse Ave, Syracuse, NY 13210",
+                position: { x: 52, y: 58 },
+                hours: "Wed-Sun 11:00 AM - 6:00 PM",
+                details: "Curated vintage clothing and accessories. Specializing in 1960s-1990s fashion. Student discounts available with valid ID. Consignment opportunities for quality vintage pieces.",
+                icon: "👗"
+            },
+            {
+                name: "Green Waste Solutions",
+                category: "compost",
+                address: "5000 W Genesee St, Camillus, NY 13031",
+                position: { x: 15, y: 48 },
+                hours: "Mon-Fri 7:00 AM - 5:00 PM",
+                details: "Commercial and residential composting services. Drop-off available for yard waste, wood chips, and organic materials. Bulk compost and mulch sales. Volume discounts for landscaping projects.",
+                icon: "🌱"
+            },
+            {
+                name: "Buy Nothing Store",
+                category: "donation",
+                address: "127 Walton St, Syracuse, NY 13202",
+                position: { x: 45, y: 48 },
+                hours: "Thu-Sat 10:00 AM - 4:00 PM",
+                details: "Free store operating on gift economy principles. Take what you need, give what you can. No money exchanged. Household items, clothing, books, and more. Building community through sharing.",
+                icon: "🎁"
+            },
+            {
+                name: "Sustainable Living Co.",
+                category: "market",
+                address: "2400 James St, Syracuse, NY 13206",
+                position: { x: 65, y: 55 },
+                hours: "Mon-Sat 9:00 AM - 7:00 PM, Sun 10:00 AM - 5:00 PM",
+                details: "Eco-friendly household essentials and sustainable products. Refill stations for cleaning supplies, personal care items, and detergents. Zero-waste lifestyle products and reusable alternatives to single-use items.",
+                icon: "🌍"
+            }
+        ];
+
+        let currentFilter = 'all';
+
+        function initializeMap() {
+            const mapPinsContainer = document.getElementById('mapPins');
+            mapPinsContainer.innerHTML = '';
+
+            locations.forEach((location, index) => {
+                const pin = document.createElement('div');
+                pin.className = `map-pin ${location.category}`;
+                pin.style.left = `${location.position.x}%`;
+                pin.style.top = `${location.position.y}%`;
+                pin.setAttribute('data-category', location.category);
+                
+                pin.innerHTML = `
+                    ${location.icon}
+                    <div class="pin-tooltip">
+                        <span class="category-tag">${location.category}</span>
+                        <h4>${location.name}</h4>
+                        <p><strong>Hours:</strong> ${location.hours}</p>
+                        <p><strong>Address:</strong> ${location.address}</p>
+                    </div>
+                `;
+                
+                mapPinsContainer.appendChild(pin);
+            });
+        }
+
+        function filterMap(category) {
+            currentFilter = category;
+            
+            // Update active button
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            // Filter pins
+            const pins = document.querySelectorAll('.map-pin');
+            pins.forEach(pin => {
+                if (category === 'all' || pin.getAttribute('data-category') === category) {
+                    pin.style.display = 'flex';
+                } else {
+                    pin.style.display = 'none';
+                }
+            });
+        }
+
+        function displayAllLocations() {
+            const listContainer = document.getElementById('allLocationsList');
+            listContainer.innerHTML = '';
+
+            locations.forEach(location => {
+                const card = document.createElement('div');
+                card.className = 'location-card';
+                
+                card.innerHTML = `
+                    <h3>${location.icon} ${location.name}</h3>
+                    <span class="category-badge">${location.category}</span>
+                    
+                    <div class="detail-section">
+                        <strong>Address:</strong>
+                        <p>${location.address}</p>
+                    </div>
+                    
+                    <div class="detail-section">
+                        <strong>Hours:</strong>
+                        <p>${location.hours}</p>
+                    </div>
+                    
+                    <div class="detail-section">
+                        <strong>Details:</strong>
+                        <p>${location.details}</p>
+                    </div>
+                `;
+                
+                listContainer.appendChild(card);
+            });
+        }
+
+        function handleSubmit(event) {
+            event.preventDefault();
+            alert('Thank you for your contribution! Your submission will be reviewed and added to GreenSyracuse soon.');
+            event.target.reset();
+        }
+
+        // Initialize the map and location list when page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            initializeMap();
+            displayAllLocations();
+        });
+    </script>
+</body>
+</html>
